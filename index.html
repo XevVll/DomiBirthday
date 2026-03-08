@@ -1,0 +1,527 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Ein Geschenk wartet auf dich…</title>
+<link href="https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@400;700&family=Cinzel:wght@400;600&family=EB+Garamond:ital,wght@0,400;0,500;1,400&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --ink:    #0d0a0e;
+    --deep:   #12091a;
+    --gold:   #c9933a;
+    --gold2:  #e8bf6a;
+    --parch:  #f0e6c8;
+    --parch2: #e8d9a8;
+    --ruby:   #8b1a1a;
+    --glow:   rgba(201,147,58,0.25);
+  }
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  html, body {
+    width: 100%; min-height: 100vh;
+    background: var(--deep);
+    color: var(--parch);
+    font-family: 'EB Garamond', serif;
+    overflow-x: hidden;
+  }
+
+  /* ── Stars ── */
+  #stars {
+    position: fixed; inset: 0; z-index: 0;
+    pointer-events: none;
+  }
+  .star {
+    position: absolute;
+    border-radius: 50%;
+    background: white;
+    animation: twinkle var(--d, 3s) ease-in-out infinite var(--delay, 0s);
+  }
+  @keyframes twinkle {
+    0%,100% { opacity: 0.1; transform: scale(1); }
+    50%      { opacity: 0.9; transform: scale(1.4); }
+  }
+
+  /* ── Particles ── */
+  #particles {
+    position: fixed; inset: 0; z-index: 0;
+    pointer-events: none; overflow: hidden;
+  }
+  .particle {
+    position: absolute; bottom: -10px;
+    width: 4px; height: 4px; border-radius: 50%;
+    background: var(--gold);
+    animation: rise var(--dur, 6s) ease-in infinite var(--delay, 0s);
+    opacity: 0;
+  }
+  @keyframes rise {
+    0%   { transform: translateY(0) translateX(0) scale(1); opacity: 0; }
+    10%  { opacity: 0.8; }
+    90%  { opacity: 0.3; }
+    100% { transform: translateY(-100vh) translateX(var(--drift, 30px)) scale(0.3); opacity: 0; }
+  }
+
+  /* ── Layout ── */
+  .scene {
+    position: relative; z-index: 1;
+    min-height: 100vh;
+    display: flex; flex-direction: column;
+    align-items: center; justify-content: center;
+    padding: 2rem 1rem;
+  }
+
+  /* ── Password Screen ── */
+  #lock-screen {
+    display: flex; flex-direction: column;
+    align-items: center; gap: 1.5rem;
+    max-width: 420px; width: 100%;
+    animation: fadeIn 1.5s ease;
+  }
+
+  .rune-circle {
+    width: 110px; height: 110px;
+    border: 2px solid var(--gold);
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 2.8rem;
+    box-shadow: 0 0 30px var(--glow), inset 0 0 20px var(--glow);
+    animation: rotateGlow 4s linear infinite;
+    position: relative;
+  }
+  .rune-circle::before {
+    content: '';
+    position: absolute; inset: 6px;
+    border: 1px dashed rgba(201,147,58,0.4);
+    border-radius: 50%;
+    animation: rotateGlow 8s linear infinite reverse;
+  }
+  @keyframes rotateGlow {
+    0%   { box-shadow: 0 0 20px var(--glow), inset 0 0 15px var(--glow); }
+    50%  { box-shadow: 0 0 40px rgba(201,147,58,0.5), inset 0 0 30px rgba(201,147,58,0.2); }
+    100% { box-shadow: 0 0 20px var(--glow), inset 0 0 15px var(--glow); }
+  }
+
+  .lock-title {
+    font-family: 'Cinzel Decorative', serif;
+    font-size: clamp(1.1rem, 4vw, 1.5rem);
+    color: var(--gold2);
+    text-align: center;
+    text-shadow: 0 0 20px rgba(201,147,58,0.6);
+    letter-spacing: 0.05em;
+  }
+  .lock-subtitle {
+    font-family: 'EB Garamond', serif;
+    font-style: italic;
+    color: rgba(240,230,200,0.6);
+    text-align: center;
+    font-size: 1rem;
+  }
+
+  .spell-input-wrap {
+    position: relative; width: 100%;
+  }
+  .spell-input {
+    width: 100%;
+    background: rgba(13,10,14,0.7);
+    border: 1px solid var(--gold);
+    border-radius: 4px;
+    color: var(--gold2);
+    font-family: 'EB Garamond', serif;
+    font-size: 1.1rem;
+    padding: 0.8rem 1rem;
+    outline: none;
+    text-align: center;
+    letter-spacing: 0.15em;
+    box-shadow: 0 0 15px rgba(201,147,58,0.1);
+    transition: box-shadow 0.3s;
+  }
+  .spell-input::placeholder { color: rgba(201,147,58,0.3); letter-spacing: 0.1em; }
+  .spell-input:focus { box-shadow: 0 0 25px rgba(201,147,58,0.35); }
+
+  .spell-btn {
+    width: 100%;
+    background: linear-gradient(135deg, #2a1500, #1a0d00);
+    border: 1px solid var(--gold);
+    border-radius: 4px;
+    color: var(--gold2);
+    font-family: 'Cinzel', serif;
+    font-size: 1rem;
+    font-weight: 600;
+    letter-spacing: 0.15em;
+    padding: 0.85rem;
+    cursor: pointer;
+    transition: all 0.3s;
+    text-transform: uppercase;
+    box-shadow: 0 0 15px rgba(201,147,58,0.15);
+  }
+  .spell-btn:hover {
+    background: linear-gradient(135deg, #3d2000, #281200);
+    box-shadow: 0 0 30px rgba(201,147,58,0.35);
+    color: #fff8e0;
+  }
+
+  .error-msg {
+    color: #c0392b;
+    font-style: italic;
+    font-size: 0.9rem;
+    text-align: center;
+    min-height: 1.2em;
+    animation: shake 0.4s ease;
+  }
+  @keyframes shake {
+    0%,100% { transform: translateX(0); }
+    25%      { transform: translateX(-8px); }
+    75%      { transform: translateX(8px); }
+  }
+
+  /* ── Card ── */
+  #card-screen {
+    display: none;
+    flex-direction: column;
+    align-items: center;
+    gap: 0;
+    max-width: 580px;
+    width: 100%;
+    animation: unfurl 1.2s ease;
+  }
+  @keyframes unfurl {
+    0%   { opacity: 0; transform: perspective(800px) rotateX(-15deg) scale(0.9); }
+    100% { opacity: 1; transform: perspective(800px) rotateX(0deg) scale(1); }
+  }
+
+  /* Book spine decoration */
+  .book-spine {
+    width: 96%;
+    height: 18px;
+    background: linear-gradient(90deg, #1a0d00, #3d2000 20%, #5c3300 50%, #3d2000 80%, #1a0d00);
+    border-radius: 3px 3px 0 0;
+    border: 1px solid #8b6020;
+    border-bottom: none;
+    box-shadow: 0 -4px 12px rgba(0,0,0,0.5);
+  }
+
+  .tome {
+    background:
+      radial-gradient(ellipse at 20% 30%, rgba(201,147,58,0.06) 0%, transparent 60%),
+      radial-gradient(ellipse at 80% 70%, rgba(139,26,26,0.08) 0%, transparent 60%),
+      linear-gradient(160deg, #f5ebd0 0%, #ede0b8 40%, #e8d8a5 70%, #dfd09a 100%);
+    border: 2px solid #8b6020;
+    border-top: none;
+    border-radius: 0 0 8px 8px;
+    padding: 2.5rem 2rem 2rem;
+    width: 100%;
+    position: relative;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.7), inset 0 0 60px rgba(139,96,32,0.1);
+    color: #2a1800;
+  }
+
+  /* Torn-edge top */
+  .tome::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 3px;
+    background: repeating-linear-gradient(90deg, #8b6020 0px, #c49a30 3px, #8b6020 6px);
+  }
+
+  /* Corner ornaments */
+  .corner {
+    position: absolute;
+    width: 40px; height: 40px;
+    opacity: 0.5;
+    font-size: 1.3rem;
+    display: flex; align-items: center; justify-content: center;
+    color: #8b6020;
+  }
+  .corner-tl { top: 6px; left: 6px; }
+  .corner-tr { top: 6px; right: 6px; }
+  .corner-bl { bottom: 6px; left: 6px; }
+  .corner-br { bottom: 6px; right: 6px; }
+
+  /* Divider */
+  .tome-divider {
+    text-align: center;
+    margin: 1.2rem 0;
+    color: #8b6020;
+    font-size: 1rem;
+    letter-spacing: 0.3em;
+    opacity: 0.7;
+  }
+
+  .tome-header {
+    text-align: center;
+    margin-bottom: 1.5rem;
+  }
+  .tome-eyebrow {
+    font-family: 'Cinzel', serif;
+    font-size: 0.7rem;
+    letter-spacing: 0.3em;
+    text-transform: uppercase;
+    color: #6b4a10;
+    margin-bottom: 0.5rem;
+  }
+  .tome-title {
+    font-family: 'Cinzel Decorative', serif;
+    font-size: clamp(1.4rem, 5vw, 2rem);
+    color: #3d1f00;
+    line-height: 1.2;
+    text-shadow: 1px 1px 0 rgba(255,255,255,0.4);
+  }
+  .tome-subtitle {
+    font-family: 'EB Garamond', serif;
+    font-style: italic;
+    font-size: 1.05rem;
+    color: #6b4a10;
+    margin-top: 0.4rem;
+  }
+
+  .scroll-text {
+    font-size: 1.05rem;
+    line-height: 1.9;
+    color: #2a1800;
+    text-align: center;
+    font-style: italic;
+    padding: 0 0.5rem;
+  }
+  .scroll-text strong {
+    font-style: normal;
+    color: #5c1010;
+    font-weight: 600;
+  }
+
+  /* Credential box */
+  .credential-box {
+    background: rgba(42,24,0,0.07);
+    border: 1px solid rgba(139,96,32,0.5);
+    border-radius: 4px;
+    padding: 1.2rem 1.5rem;
+    margin: 1.2rem 0;
+    position: relative;
+  }
+  .credential-box::before {
+    content: '⚔';
+    position: absolute;
+    top: -0.7rem; left: 50%;
+    transform: translateX(-50%);
+    background: #e8d8a5;
+    padding: 0 0.5rem;
+    color: #8b6020;
+    font-size: 0.9rem;
+  }
+
+  .cred-row {
+    display: flex;
+    align-items: baseline;
+    gap: 0.8rem;
+    margin: 0.5rem 0;
+  }
+  .cred-label {
+    font-family: 'Cinzel', serif;
+    font-size: 0.72rem;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: #6b4a10;
+    min-width: 100px;
+    flex-shrink: 0;
+  }
+  .cred-value {
+    font-size: 1.05rem;
+    color: #1a0d00;
+    font-weight: 500;
+    word-break: break-all;
+    background: rgba(255,255,255,0.35);
+    padding: 0.15rem 0.5rem;
+    border-radius: 3px;
+    border: 1px solid rgba(139,96,32,0.2);
+    flex: 1;
+  }
+
+  .playstore-link {
+    display: block;
+    text-align: center;
+    margin-top: 1.3rem;
+    padding: 0.8rem 1.5rem;
+    background: linear-gradient(135deg, #3d1f00, #5c3300);
+    border: 1px solid #8b6020;
+    border-radius: 4px;
+    color: var(--gold2);
+    text-decoration: none;
+    font-family: 'Cinzel', serif;
+    font-size: 0.85rem;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    transition: all 0.3s;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+  }
+  .playstore-link:hover {
+    background: linear-gradient(135deg, #5c3300, #7a4500);
+    box-shadow: 0 4px 25px rgba(201,147,58,0.3);
+    color: #fff8e0;
+  }
+
+  .seal {
+    text-align: center;
+    margin-top: 1.5rem;
+    font-size: 0.78rem;
+    color: #6b4a10;
+    font-style: italic;
+    opacity: 0.7;
+  }
+
+  /* ── Utils ── */
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(20px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+</style>
+</head>
+<body>
+
+<canvas id="stars"></canvas>
+<div id="particles"></div>
+
+<div class="scene">
+
+  <!-- PASSWORD SCREEN -->
+  <div id="lock-screen">
+    <div class="rune-circle">🔮</div>
+    <h1 class="lock-title">Ein Geschenk wartet auf dich</h1>
+    <p class="lock-subtitle">Sprich das Zauberwort, um das Tor zu öffnen…</p>
+    <div class="spell-input-wrap">
+      <input class="spell-input" type="password" id="pw-input"
+             placeholder="✦  Zauberwort  ✦"
+             onkeydown="if(event.key==='Enter') unlock()">
+    </div>
+    <button class="spell-btn" onclick="unlock()">✦ Das Siegel brechen ✦</button>
+    <p class="error-msg" id="err-msg"></p>
+  </div>
+
+  <!-- BIRTHDAY CARD -->
+  <div id="card-screen">
+    <div class="book-spine"></div>
+    <div class="tome">
+      <span class="corner corner-tl">✦</span>
+      <span class="corner corner-tr">✦</span>
+      <span class="corner corner-bl">✦</span>
+      <span class="corner corner-br">✦</span>
+
+      <div class="tome-header">
+        <div class="tome-eyebrow">Ein Geschenk für den Helden</div>
+        <div class="tome-title">Alles Gute<br>zum Geburtstag,<br>Dominik!</div>
+        <div class="tome-subtitle">Möge dein Jahr voller Abenteuer sein</div>
+      </div>
+
+      <div class="tome-divider">⸻ ✦ ⸻</div>
+
+      <p class="scroll-text">
+        In den alten Schriften heißt es:<br>
+        <em>„Die mächtigsten Abenteuer beginnen mit einer einzigen Geschichte."</em><br><br>
+        Hiermit übergebe ich dir Zugang zu einem Reich voller
+        <strong>Hörspiele, Hörbücher & Fantasiewelten</strong> —
+        zum Hören wann immer du willst, so oft du willst.
+      </p>
+
+      <div class="tome-divider">⸻ ✦ ⸻</div>
+
+      <div class="credential-box">
+        <div class="cred-row">
+          <span class="cred-label">Benutzername</span>
+          <!-- ✏️ HIER deine Audible E-Mail eintragen -->
+          <span class="cred-value">DEINE_EMAIL@beispiel.de</span>
+        </div>
+        <div class="cred-row">
+          <span class="cred-label">Passwort</span>
+          <!-- ✏️ HIER dein Audible Passwort eintragen -->
+          <span class="cred-value">DEIN_PASSWORT</span>
+        </div>
+      </div>
+
+      <a class="playstore-link"
+         href="https://play.google.com/store/apps/details?id=com.audible.application"
+         target="_blank">
+        ▶ &nbsp; Audible im Play Store öffnen
+      </a>
+
+      <div class="seal">
+        ✦ &nbsp; Mit brüderlicher Zuneigung überreicht &nbsp; ✦<br>
+        Bis zu 5 Geräte gleichzeitig · Viel Freude beim Hören
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<script>
+  // ── Stars ──
+  const canvas = document.getElementById('stars');
+  const ctx = canvas.getContext('2d');
+  let stars = [];
+  function resizeCanvas() {
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+  }
+  function makeStars() {
+    stars = [];
+    for (let i = 0; i < 180; i++) {
+      stars.push({
+        x: Math.random() * canvas.width,
+        y: Math.random() * canvas.height,
+        r: Math.random() * 1.2 + 0.2,
+        a: Math.random(),
+        speed: Math.random() * 0.008 + 0.003,
+        phase: Math.random() * Math.PI * 2
+      });
+    }
+  }
+  function drawStars(t) {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    stars.forEach(s => {
+      const alpha = 0.2 + 0.7 * (0.5 + 0.5 * Math.sin(t * s.speed + s.phase));
+      ctx.beginPath();
+      ctx.arc(s.x, s.y, s.r, 0, Math.PI * 2);
+      ctx.fillStyle = `rgba(255,255,220,${alpha})`;
+      ctx.fill();
+    });
+    requestAnimationFrame(drawStars);
+  }
+  resizeCanvas(); makeStars(); drawStars(0);
+  window.addEventListener('resize', () => { resizeCanvas(); makeStars(); });
+
+  // ── Particles ──
+  const particleContainer = document.getElementById('particles');
+  for (let i = 0; i < 22; i++) {
+    const p = document.createElement('div');
+    p.className = 'particle';
+    p.style.cssText = `
+      left: ${Math.random() * 100}%;
+      --dur: ${5 + Math.random() * 8}s;
+      --delay: ${Math.random() * 8}s;
+      --drift: ${(Math.random() - 0.5) * 80}px;
+      width: ${2 + Math.random() * 3}px;
+      height: ${2 + Math.random() * 3}px;
+      background: ${Math.random() > 0.5 ? '#c9933a' : '#e8bf6a'};
+    `;
+    particleContainer.appendChild(p);
+  }
+
+  // ── Password ──
+  function unlock() {
+    const val = document.getElementById('pw-input').value;
+    const err = document.getElementById('err-msg');
+    if (val === 'Dominik2026!') {
+      document.getElementById('lock-screen').style.display = 'none';
+      const card = document.getElementById('card-screen');
+      card.style.display = 'flex';
+    } else {
+      err.textContent = '✦ Das Siegel widersteht dir… versuche es erneut. ✦';
+      document.getElementById('pw-input').value = '';
+      // Re-trigger animation
+      err.style.animation = 'none';
+      err.offsetHeight;
+      err.style.animation = '';
+    }
+  }
+</script>
+</body>
+</html>
